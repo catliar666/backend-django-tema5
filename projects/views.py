@@ -6,19 +6,9 @@ from bson import ObjectId
 
 from django.http import JsonResponse
 
-# def test_mongo_connection(request):
-#     try:
-#         # Intentar listar las bases de datos
-#         mongoengine.connect("backendMattel", host="127.0.0.1", port=27017)
-#         databases = mongoengine.connection.get_db().list_collection_names()
-#         return JsonResponse({"mensaje": "Conectado correctamente", "bases_de_datos": databases})
-#     except Exception as e:
-#         return JsonResponse({"error": str(e)}, status=500)
-
-
 def todos(request):
     personajes = Personajes.objects.all()
-    personajes_list = list(personajes)  # Convertir QuerySet a lista
+    personajes_list = list(personajes)
 
     if personajes_list:
         return JsonResponse({
@@ -26,11 +16,11 @@ def todos(request):
             "personajes": [
                 {
                     **p.to_mongo(),
-                    "_id": str(p.id)  # Convertir ObjectId a string
+                    "_id": str(p.id)
                 }
                 for p in personajes_list
             ]
-        }, safe=False)  # `safe=False` permite devolver listas en JsonResponse
+        }, safe=False)
     else:
         return JsonResponse({"error": "No hay personajes en la base de datos"}, status=404)
 
@@ -38,19 +28,25 @@ def todos(request):
 def create_personaje(request):
     if request.method == "POST":
         try:
-            data = json.loads(request.body)  # Extraer datos JSON del request
+            data = json.loads(request.body)
+            personaje_id = data.get("id")
+            if personaje_id:
+                personaje_id = ObjectId(personaje_id)
+            
             personaje = Personajes(
+                id=personaje_id,
                 nombre=data.get("Nombre"),
                 tipo_de_monstruo=data.get("TipoDeMonstruo"),
-                fecha_de_lanzamiento=data.get("FechaDeLanzamiento"),  # Corrección de typo en la clave
+                fecha_de_lanzamiento=data.get("FechaDeLanzamiento"),
                 ciudad_natal=data.get("CiudadNatal"),
                 edad=data.get("Edad"),
                 foto=data.get("Foto")
-            )
-            personaje.save()  # MongoDB generará `_id` automáticamente
-            return JsonResponse({"mensaje": "Personaje insertado correctamente", "id": str(personaje.id)})  # Convertimos ObjectId a str
+            ) 
+            personaje.save()
+            return JsonResponse({"mensaje": "Personaje insertado correctamente", "id": str(personaje.id)})
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=400)
+    
     return JsonResponse({"error": "Método no permitido"}, status=405)
 
 
@@ -115,8 +111,8 @@ def find_personaje(request, id=None):
 def update_personaje(request, id):
     if request.method == "PUT":
         try:
-            data = json.loads(request.body)  # Extraer datos JSON
-            personaje = Personajes.objects.filter(id=ObjectId(id)).first()  # Convertir ID a ObjectId
+            data = json.loads(request.body)
+            personaje = Personajes.objects.filter(id=ObjectId(id)).first()
 
             if personaje:
                 personaje.update(
@@ -127,7 +123,7 @@ def update_personaje(request, id):
                     edad=data.get("Edad", personaje.edad),
                     foto=data.get("Foto", personaje.foto)
                 )
-                personaje.reload()  # Recargar datos después de actualizar
+                personaje.reload()
                 return JsonResponse({"mensaje": "Personaje actualizado", "id": str(personaje.id), "nombre": personaje.nombre})
             else:
                 return JsonResponse({"error": "Personaje no encontrado"}, status=404)
@@ -140,7 +136,7 @@ def update_personaje(request, id):
 def delete_personaje(request, id):
     if request.method == "DELETE":
         try:
-            personaje = Personajes.objects.filter(id=ObjectId(id)).first()  # Convertir ID a ObjectId
+            personaje = Personajes.objects.filter(id=ObjectId(id)).first()
             if personaje:
                 personaje.delete()
                 return JsonResponse({"mensaje": "Personaje eliminado"})
