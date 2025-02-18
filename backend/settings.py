@@ -57,7 +57,7 @@ MIDDLEWARE = [
 CORS_ALLOWED_ORIGINS = os.getenv("CORS_ORIGINS", "").split(",")
 
 # Si sigue fallando, usa esto temporalmente (NO recomendado en producción)
-CORS_ALLOW_ALL_ORIGINS = True  # ⚠️ Solo para pruebas, cámbialo a False después
+CORS_ALLOW_ALL_ORIGINS = False  # Solo para pruebas, cámbialo a False después
 
 # Permitir credenciales (si usas autenticación con cookies o tokens)
 CORS_ALLOW_CREDENTIALS = True
