@@ -1,10 +1,28 @@
 import json
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from .models import Personajes
+from .models import Personajes, Usuarios
 from bson import ObjectId
 
 from django.http import JsonResponse
+
+def find_usuarios(request):
+    usuarios = Usuarios.objects.all()
+    usuarios_list = list(usuarios)
+
+    if usuarios_list:
+        return JsonResponse({
+            "mensaje": "Usuarios encontrados",
+            "usuarios": [
+                {
+                    **p.to_mongo(),
+                    "_id": str(p.id)
+                }
+                for p in usuarios_list
+            ]
+        }, safe=False)
+    else:
+        return JsonResponse({"error": "No hay usuarios en la base de datos"}, status=404)
 
 def todos(request):
     personajes = Personajes.objects.all()

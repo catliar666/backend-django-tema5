@@ -12,7 +12,16 @@ class Personajes(Document):
     edad = IntField(db_field="Edad")
     foto = StringField(db_field="Foto")
 
-    meta = {"collection": "personajes"}  # Asegurar que se usa la colección correcta
+    meta = {"collection": "personajes"} 
+    
+    
+class Usuarios(Document):
+    id = ObjectIdField(default=ObjectId, primary_key=True)  # Mapea "Id" de MongoDB a "id"
+    usuario = StringField(max_length=100, db_field="usuario")
+    email = StringField(max_length=100, db_field="email")
+    password = StringField(max_length=5, db_field="password")
+
+    meta = {"collection": "usuarios"}
 
 
 
