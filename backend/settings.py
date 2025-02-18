@@ -44,6 +44,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware'
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -51,6 +52,28 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+CORS_ALLOWED_ORIGINS = os.getenv("CORS_ORIGINS", "").split(",")
+
+# Si sigue fallando, usa esto temporalmente (NO recomendado en producción)
+CORS_ALLOW_ALL_ORIGINS = True  # ⚠️ Solo para pruebas, cámbialo a False después
+
+# Permitir credenciales (si usas autenticación con cookies o tokens)
+CORS_ALLOW_CREDENTIALS = True
+
+# Permitir métodos específicos
+CORS_ALLOW_METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
+
+# Permitir ciertos encabezados en las solicitudes
+CORS_ALLOW_HEADERS = [
+    "authorization",
+    "content-type",
+    "x-requested-with",
+    "accept",
+    "origin",
+    "user-agent",
+    "x-csrftoken"
 ]
 
 ROOT_URLCONF = 'backend.urls'
